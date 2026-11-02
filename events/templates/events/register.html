@@ -1,0 +1,37 @@
+{% extends 'events/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Kayıt Ol</h4>
+
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ field.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+
+                    <button type="submit" class="btn btn-primary w-100">Hesap Oluştur</button>
+
+                </form>
+                <div class="text-center mt-3">
+                    <small>Zaten hesbaınız var mı? <a href="{% url 'login' %}">Giriş Yap</a></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

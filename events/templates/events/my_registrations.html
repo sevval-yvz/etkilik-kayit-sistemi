@@ -1,0 +1,48 @@
+{% extends 'events/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0">Kayıt Olduğum Etkinlikler</h2>
+    <a href="{% url 'event_list' %}" class="btn btn-outline-primary btn-sm">← Tüm Etkinlikler</a>
+</div>
+
+{% if registrations %}
+    <div class="table-responsive bg-white rounded shadow-sm p-3">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">Etkinlik</th>
+                    <th scope="col">Tarih</th>
+                    <th scope="col">Konum</th>
+                    <th scope="col">Kayıt Tarihi</th>
+                    <th scope="col" class="text-end">İşlem</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reg in registrations %}
+                    <tr>
+                        <td>
+                            <strong class="text-dark">{{ reg.event.title }}</strong>
+                        </td>
+                        <td>{{ reg.event.date|date:"d M Y, H:i" }}</td>
+                        <td>{{ reg.event.location }}</td>
+                        <td class="text-muted small">{{ reg.registered_at|date:"d M Y, H:i" }}</td>
+                        <td class="text-end">
+                            <a href="{% url 'cancel_registration' reg.id %}" 
+                               class="btn btn-outline-danger btn-sm"
+                               onclick="return confirm('Bu etkinliğe olan kaydınızı iptal etmek istediğinize emin misiniz?');">
+                                Kaydı İptal Et
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="alert alert-light border py-5 text-center">
+        <h5 class="text-muted mb-2">Henüz kayıt olduğunuz bir etkinlik yok.</h5>
+        <a href="{% url 'event_list' %}" class="btn btn-primary btn-sm mt-2">Etkinliklere Göz At</a>
+    </div>
+{% endif %}
+{% endblock %}

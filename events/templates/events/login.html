@@ -1,0 +1,42 @@
+{% extends 'events/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h4 class="mb-0">Giriş Yap</h4>
+
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert aert-danger py-2">
+                            {{form.non_field_errors.0}}
+
+                        </div>
+                    {%endif%}
+
+                    {%for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label">{{field.label}}</label>
+                            {{field}}
+                            {% if field.errors %}
+                                <div class="tetxt-danger small mt-1">
+                                    {{field.errors.0}}
+                                </div>
+                            {%endif%}
+                        </div>
+                    {%endfor%}
+                    <button type="submit" class="btn btn-dark w-100">Giriş Yap</button>
+                </form>
+                <div class="test-center mt-3">
+                    <small>Hesabınız yok mu?<a href="{% url 'register' %}">Kayıt Ol</a></a></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
