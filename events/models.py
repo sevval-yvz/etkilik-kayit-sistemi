@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 class Event(models.Model):
     organizer = models.ForeignKey(User,on_delete=models.CASCADE,related_name='organized_events',verbose_name='Organizatör')
@@ -15,11 +16,21 @@ class Event(models.Model):
 
     @property
     def registered_count(self):
-        return self.registrations.count()
+        return self.registrations.count() if hasattr(self, 'registrations') else self.registration_set.count()
 
     @property
     def remaining_capacity(self):
         return max(0,self.capacity-self.registered_count)
+
+    @property
+    def occupancy_percentage(self):
+        if self.capacity == 0:
+            return 100
+        return int((self.registered_count / self.capacity) * 100)
+
+    @property
+    def is_past(self):
+        return self.date < timezone.now()
 
     @property
     def is_full(self):

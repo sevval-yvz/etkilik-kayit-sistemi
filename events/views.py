@@ -4,6 +4,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import RegisterForm, LoginForm
 from .models import Event, Registration
+from django.db.models import Q
+from django.utils import timezone
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.forms import AuthenticationForm
 
 def register_view(request):
     if request.user.is_authenticated:
@@ -22,18 +26,17 @@ def register_view(request):
     return render(request,'events/register.html',{'form':form})
 
 def login_view(request):
-    if request.user.is_authenticated:
-        return redirect('event_list')
-
     if request.method == 'POST':
-        form = LoginForm(request.POST)
+        form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
-            login(request, form.user)
-            messages.success(request, f'Tekrar hoş geldiniz, {form.user.username}!')
+            user = form.get_user()  # <-- form.user yerine form.get_user() olmalı
+            login(request, user)
+            messages.success(request, f'Hoş geldiniz, {user.username}!')
             return redirect('event_list')
+        else:
+            messages.error(request, 'Kullanıcı adı veya şifre hatalı.')
     else:
-        form = LoginForm()
-
+        form = AuthenticationForm()
     return render(request, 'events/login.html', {'form': form})
 
 def logout_view(request):
@@ -42,13 +45,31 @@ def logout_view(request):
     return redirect('login')
 
 def event_list_view(request):
-    events=Event.objects.all().order_by('date')
+    query = request.GET.get('q', '').strip()
+    now = timezone.now()
 
-    user_registered_event_ids=[]
+    
+    events = Event.objects.all().order_by('date')
+
+    
+    if query:
+        events = events.filter(
+            Q(title__icontains=query) | Q(location__icontains=query)
+        )
+
+    user_registered_event_ids = []
     if request.user.is_authenticated:
-        user_registered_event_ids=list(Registration.objects.filter(
+        user_registered_event_ids = list(Registration.objects.filter(
             user=request.user
-        ).values_list('event_id',flat=True))
+        ).values_list('event_id', flat=True))
+
+    context = {
+        'events': events,
+        'user_registered_event_ids': user_registered_event_ids,
+        'query': query,
+        'now': now,
+    }
+    return render(request, 'events/event_list.html', context)
 
     context={
         'events':events,
@@ -58,18 +79,26 @@ def event_list_view(request):
     return render(request,'events/event_list.html',context)
 
 @login_required(login_url='login')
-def register_event_view(request,event_id):
-    event=get_object_or_404(Event,id=event_id)
+def register_event_view(request, event_id):
+    
+    event = get_object_or_404(Event, id=event_id)
 
+    
+    if event.is_past:
+        messages.error(request, f'"{event.title}" etkinliğinin tarihi geçtiği için kayıt olunamaz.')
+        return redirect('event_list')
+
+    
     if Registration.objects.filter(user=request.user, event=event).exists():
-        messages.warning(request,f'"{event.title}" etkinliğine zaten kayıtlısınız.')
+        messages.warning(request, f'"{event.title}" etkinliğine zaten kayıtlısınız.')
         return redirect('event_list')
 
-    current_count=Registration.objects.filter(event=event).count()
-    if current_count >= event.capacity:
-        messages.error(request,f'Üzgünüz, "{event.title}" için kontenjan dolmuştur!')
+    
+    if event.is_full:
+        messages.error(request, f'Üzgünüz, "{event.title}" için kontenjan dolmuştur!')
         return redirect('event_list')
 
+    
     Registration.objects.create(user=request.user, event=event)
     messages.success(request, f'Tebrikler! "{event.title}" etkinliğine kaydınız başarıyla alındı.')
     return redirect('event_list')
