@@ -1,10 +1,10 @@
-# 🎟️ Django Etkinlik Kayıt Sistemi
+#  Django Etkinlik Kayıt Sistemi
 
 Kullanıcıların yaklaşan etkinlikleri inceleyebileceği, arama yapabileceği ve kontenjan dahilinde katılım kaydı oluşturup iptal edebileceği tam kapsamlı bir web uygulaması.
 
 ---
 
-## 🚀 Özellikler
+##  Özellikler
 
 - **Kullanıcı Kimlik Doğrulama:** Kayıt olma (`Register`), güvenli oturum açma (`Login`) ve çıkış (`Logout`) mekanizması.
 - **Etkinlik Vitrini:** Aktif etkinlikleri tarih sırasına göre listeleme.
@@ -21,7 +21,7 @@ Kullanıcıların yaklaşan etkinlikleri inceleyebileceği, arama yapabileceği 
 
 ---
 
-## 🛠️ Kullanılan Teknolojiler
+##  Kullanılan Teknolojiler
 
 - **Backend:** Python 3.12, Django
 - **Frontend:** HTML5, CSS3, Bootstrap 5
@@ -30,7 +30,7 @@ Kullanıcıların yaklaşan etkinlikleri inceleyebileceği, arama yapabileceği 
 
 ---
 
-## 📦 Kurulum ve Çalıştırma
+##  Kurulum ve Çalıştırma
 
 Projeyi yerel ortamınızda ayağa kaldırmak için aşağıdaki adımları izleyin:
 
